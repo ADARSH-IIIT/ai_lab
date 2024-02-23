@@ -1,71 +1,63 @@
-class State {
-    constructor(jug1, jug2, path = []) {
-        this.jug1 = jug1;
-        this.jug2 = jug2;
-        this.path = path;
-    }
+// jug1 and jug2 contain the value
+// for max capacity in respective jugs
+// and aim is the amount of water to be measured.
+let jug1 = 5;
+let jug2 = 3;
+let aim = 2;
 
-    isGoal(goal) {
-        return this.jug1 === goal || this.jug2 === goal;
-    }
+// Initialize dictionary with
+// default value as false.
+let visited = new Set();
 
-    isValid(capacity1, capacity2) {
-        return this.jug1 >= 0 && this.jug1 <= capacity1 &&
-               this.jug2 >= 0 && this.jug2 <= capacity2;
-    }
-
-    toString() {
-        return `(${this.jug1}, ${this.jug2})`;
-    }
+// Recursive function which prints the
+// intermediate steps to reach the final
+// solution and return boolean value
+// (True if solution is possible, otherwise False).
+// amt1 and amt2 are the amount of water present
+// in both jugs at a certain point of time.
+function waterJugSolver(amt1, amt2) {
+// Checks for our goal and
+// returns true if achieved.
+if ((amt1 == aim && amt2 == 0) || (amt2 == aim && amt1 == 0)) {
+	console.log(amt1, amt2);
+	return true;
 }
 
-function solveWaterJugProblem(capacity1, capacity2, goal) {
-    let queue = [new State(0, 0)];
-    let visited = new Set();
+let key = `${amt1}-${amt2}`;
+// Checks if we have already visited the
+// combination or not. If not, then it proceeds further.
+if (!visited.has(key)) {
+	console.log(amt1, amt2);
 
-    while (queue.length > 0) {
-        let currentState = queue.shift();
+	// Changes the boolean value of
+	// the combination as it is visited.
+	visited.add(key);
 
-        if (currentState.isGoal(goal)) {
-            currentState.path.push(currentState.toString());
-            return currentState.path.join(' -> ');
-        }
-
-        let actions = [
-            { fill: 'jug1' }, { fill: 'jug2' },
-            { pour: 'jug1', into: 'jug2' }, { pour: 'jug2', into: 'jug1' },
-            { empty: 'jug1' }, { empty: 'jug2' }
-        ];
-
-        for (let action of actions) {
-            let nextState;
-            if (action.fill) {
-                nextState = new State(capacity1, currentState.jug2, [...currentState.path, currentState.toString()]);
-            } else if (action.empty) {
-                nextState = new State(action.empty === 'jug1' ? 0 : currentState.jug1,
-                                      action.empty === 'jug2' ? 0 : currentState.jug2,
-                                      [...currentState.path, currentState.toString()]);
-            } else if (action.pour && action.into) {
-                let amount = Math.min(currentState[action.pour], capacity2 - currentState[action.into]);
-                nextState = new State(action.pour === 'jug1' ? currentState.jug1 - amount : currentState.jug1 + amount,
-                                      action.pour === 'jug2' ? currentState.jug2 - amount : currentState.jug2 + amount,
-                                      [...currentState.path, currentState.toString()]);
-            }
-
-            if (nextState.isValid(capacity1, capacity2) && !visited.has(nextState.toString())) {
-                visited.add(nextState.toString());
-                queue.push(nextState);
-            }
-        }
-    }
-
-    return "No solution found";
+	// Check for all the 6 possibilities and
+	// see if a solution is found in any one of them.
+	return (
+	waterJugSolver(0, amt2) ||
+	waterJugSolver(amt1, 0) ||
+	waterJugSolver(jug1, amt2) ||
+	waterJugSolver(amt1, jug2) ||
+	waterJugSolver(
+		amt1 + Math.min(amt2, jug1 - amt1),
+		amt2 - Math.min(amt2, jug1 - amt1)
+	) ||
+	waterJugSolver(
+		amt1 - Math.min(amt1, jug2 - amt2),
+		amt2 + Math.min(amt1, jug2 - amt2)
+	)
+	);
+	// Return False if the combination is
+	// already visited to avoid repetition otherwise
+	// recursion will enter an infinite loop.
+} else {
+	return false;
+}
 }
 
-// Example usage
-const capacity1 = 4;
-const capacity2 = 3;
-const goal = 2;
-
-console.log(`Steps to reach the goal (${goal}):`);
-console.log(solveWaterJugProblem(capacity1, capacity2, goal));
+console.log("Steps:");
+// Call the function and pass the
+// initial amount of water present in both jugs.
+waterJugSolver(0, 0);
