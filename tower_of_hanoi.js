@@ -22,7 +22,7 @@ function towerOfHanoi(n, source, auxiliary, target) {
   }
   
   // Example usage:
-  const numberOfDisks = 3;
+  const numberOfDisks = 4;
   const sourcePeg = "A";
   const auxiliaryPeg = "B";
   const targetPeg = "C";
@@ -33,3 +33,12 @@ function towerOfHanoi(n, source, auxiliary, target) {
   for (const step of hanoiSteps) {
     console.log(`Move disk ${step.disk} from ${step.from} to ${step.to}`);
   }
+
+
+
+
+  ///////  4>3>2>1
+  //////////1
+  /////////2
+  /////////3
+  //////4
